@@ -1,0 +1,43 @@
+AE: # autoencoder/KitNET (anomaly detection model) parameters
+  percentage: 0.99 
+  batch_size: 1024 
+  lr: 1.e-5 
+  weight_decay: 1.e-6 
+  epoches: 10
+
+DeepLog: # DeepLog (anomaly detection model) parameters
+  window_size: 10
+  num_classes: 1605
+  num_candidates: 9 
+  num_epochs: 20
+  num_layers: 2
+  hidden_size: 64
+  test_batch: 20000  # depends on the available GPU memory
+  test_info: False
+
+# Below are hyper-parameters of OWAD
+ShiftDetector:
+  test_numrounds: 1000
+  test_thres: 0.01
+  test_bin_num: 10
+
+ShiftExplainer:
+  lr: 20
+  steps: 50
+  acc_wgt: 5
+  ohd_wgt: 10
+  det_wgt: 1
+  bbin_num: 50 
+
+ShiftAdapter:
+  reg_wgt: 0.1
+  steps: 10
+  batch_size: 1024 
+  lr: 1.e-4
+  
+Eval: # for Evaluation 
+  verbose_info: True
+  discrete_thres: 0.5
+  control_num: 50000
+  
+  
