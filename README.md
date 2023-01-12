@@ -1,11 +1,10 @@
-<img src="media/logo.png" width="60%">
+<div align=center><img src="media/logo.png" width="60%"></div>
 
+> *Anomaly Detection in the Open World: Normality Shift Detection, Explanation, and Adaptation. Accpeted by [NDSS'23](https://www.ndss-symposium.org/ndss2023/).*
 ---
 ![](https://img.shields.io/badge/license-MIT-green.svg)
 ![](https://img.shields.io/badge/language-python-blue.svg)
 ![](https://img.shields.io/badge/framework-pytorch-red.svg)
-
-> *Anomaly Detection in the Open World: Normality Shift Detection, Explanation, and Adaptation. Accpeted by [NDSS'23](https://www.ndss-symposium.org/ndss2023/).*
 
 **OWAD** aims to tackle distribution shift for deep learning based anomaly detection. In practical security applications, the distribution of data can differ and evolve over time. Such distribution shift can not induce dramatic model peformance degradation, if not detected and properly adapted. This is an important reason why learning-based methods perform well on the test set, but become extremely poor in real-world deployments.
 
