@@ -6,9 +6,9 @@
 ![](https://img.shields.io/badge/language-python-blue.svg)
 ![](https://img.shields.io/badge/framework-pytorch-red.svg)
 
-**OWAD** aims to tackle distribution shift for deep learning based anomaly detection. In practical security applications, the distribution of data can differ and evolve over time. Such distribution shift can not induce dramatic model peformance degradation, if not detected and properly adapted. This is an important reason why learning-based methods perform well on the test set, but become extremely poor in real-world deployments.
+**OWAD** aims to tackle distribution shift for deep learning based anomaly detection. In practical security applications, the distribution of data can differ and evolve over time. Such distribution shift can induce dramatic model peformance degradation, if not detected and properly adapted. This is an important reason why learning-based methods always perform well on validation or test set, but become extremely poor in real-world deployments.
 
-In this context, **OWAD** is a novel framework to *detect*, *explain* and *adapt* to distribution shift. The major advantage of **OWAD** is to **reduce the overhead of manual labeling** during investigation and adaptation of shift. The overview of **OWAD** is shown in the below figure. It includes four key steps:
+In this context, **OWAD** is a novel framework to *detect*, *explain* and *adapt* to distribution shift. The major advantage of **OWAD** is to **reduce the overhead of manual labeling** during investigation and adaptation of shift. The overview of **OWAD** is shown in the following figure. It includes four key steps:
 - Output Calibration: calibrate the model outputs to provide them a good description and get ready to distributional test in the following step;
 - Shift Detetion: detect shift via distributional test of calibrated outputs;
 - Shift Explanation: select important samples inducing the distribution shift;
@@ -26,6 +26,7 @@ In this context, **OWAD** is a novel framework to *detect*, *explain* and *adapt
 We provide several cases to show how to use **OWAD** on different use cases (different applications, models, and datasets):
 
 - [(Normal-Confidence Anomaly Detection) Auto-Encoder, NIDS, Kyoto-2006](demo/NIDS_KitNET_Kyoto.ipynb)
+- 
 
 
 # Citation
