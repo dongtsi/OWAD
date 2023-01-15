@@ -25,7 +25,8 @@ In this context, **OWAD** is a novel framework to *detect*, *explain* and *adapt
 # Use Cases
 We provide several cases to show how to use **OWAD** on different use cases (different applications, models, and datasets):
 
-- [(Normal-Confidence Anomaly Detection) Auto-Encoder, NIDS, Kyoto-2006](demo/NIDS_KitNET_Kyoto.ipynb)
+- [(Normal-Confidence Anomaly Detection) LSTM, Log Anomaly Detection, BGL](demo/LogAD_LSTM_BGL.ipynb)
+- [(Abnormal-Confidence Anomaly Detection) Auto-Encoder, NIDS, Kyoto-2006](demo/NIDS_KitNET_Kyoto.ipynb)
 - 
 
 

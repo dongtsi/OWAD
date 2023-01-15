@@ -126,7 +126,8 @@ class ShiftHunter:
         return p_value
     
     def explainer(self, 
-                 X_t,
+                 X_tre,
+                 y_tre, # this is only used for simulating labelling
                  label_num,
                  lr = ExpParams['lr'], 
                  steps = ExpParams['steps'], 
@@ -303,15 +304,15 @@ class ShiftHunter:
         self.M_c = M_c
         self.M_t = M_t
 
-        self.X_tre = X_t
-        _, remain_X_tre, remain_X_con = self.get_remain_X(self.calibrator.X_con, self.X_tre, thres = discrete_thres, label_num = label_num)
+        self.remain_X, remain_X_con, remain_X_tre = self.get_remain_X(self.calibrator.X_con, X_tre, y_tre, thres = discrete_thres, label_num = label_num)
         delete_X_con = self.get_del_Xc(self.calibrator.X_con)
-
+        
         self.EXPLAIN_RES = {
             'remain_X_tre': remain_X_tre,
             'delete_X_con': delete_X_con,
             'remain_X_con': remain_X_con,
         }
+        
         return self.EXPLAIN_RES
 
     def adapter(self, model, **kvargs):
@@ -328,7 +329,7 @@ class ShiftHunter:
             reg_wgt = AdaParams['reg_wgt'],  
             steps = AdaParams['steps'], 
             batch_size = AdaParams['batch_size'], 
-            fast_wgt_est = 5, 
+            fast_wgt_est = 10, 
             init_thres = 1-1e5, 
             verbose = EvalParams['verbose_info'], 
             ): 
@@ -376,10 +377,8 @@ class ShiftHunter:
         criterion = nn.MSELoss()
 
         init_params = get_params_list()
-
-        remain_X = np.concatenate((self.EXPLAIN_RES['remain_X_con'], self.X_tre),axis=0)
-        self.calibrator.X_con = remain_X
-        remain_X = np2ts(remain_X)
+        self.calibrator.X_con = self.remain_X # update X_con for new iter
+        remain_X = np2ts(self.remain_X)
 
         if param_weight is None:
             X = self.calibrator.X_con
@@ -427,12 +426,13 @@ class ShiftHunter:
                 reg_wgt = AdaParams['reg_wgt'],  
                 steps = AdaParams['steps'], 
                 batch_size = AdaParams['batch_size'], 
-                fast_wgt_est = 5, 
+                fast_wgt_est = 10, 
                 init_thres = 1-1e5, 
                 verbose = EvalParams['verbose_info'], 
                 ): 
 
         self.model = copy.deepcopy(model)
+        
         def get_params_weight(X,  
                               M): 
 
@@ -467,16 +467,11 @@ class ShiftHunter:
             return params_list
  
         self.model.train()
-
-        remain_X = {
-            'input':    np.concatenate((self.EXPLAIN_RES['remain_X_con']['input'],self.X_tre['input']),axis=0),
-            'output':   np.concatenate((self.EXPLAIN_RES['remain_X_con']['output'],self.X_tre['output']),axis=0)
-        }
-
         
         init_params = get_params_list()
-        self.calibrator.X_con = remain_X
-
+        self.calibrator.X_con = self.remain_X # update X_con for new iter
+        remain_X = self.remain_X
+        
         if param_weight is None:
             X = self.calibrator.X_con['input']
             M = (1-self.M_c).data.cpu().numpy()
@@ -490,13 +485,13 @@ class ShiftHunter:
         dataloader = Data.DataLoader(dataset, batch_size=batch_size, shuffle=True, pin_memory=True)
         
         criterion = nn.CrossEntropyLoss()
-        optimizer = optim.Adam(model.parameters(),lr=lr)
+        optimizer = optim.Adam(self.model.parameters(),lr=lr)
         
         for epoch in range(steps): 
             for step, (seq, label) in enumerate(dataloader):
                 seq = seq.clone().detach().view(-1, utils.get_params('DeepLog')['window_size']).to(device)
                 seq = F.one_hot(seq,num_classes=utils.get_params('DeepLog')['num_classes']).float()
-                output = model(seq)
+                output = self.model(seq)
                 Distrib_Loss = criterion(output, label.to(device))
 
                 Regularization_Loss = torch.tensor(0.).to(device)
@@ -523,6 +518,7 @@ class ShiftHunter:
 
     def get_remain_X(self, 
                 X_c, X_t, 
+                y_t, # this is only used for simulating labelling
                 thres = EvalParams['discrete_thres'], 
                 label_num = None,
                 retain_Xnum = False, 
@@ -542,7 +538,8 @@ class ShiftHunter:
 
             remain_X_c = {'input':X_c['input'][M_c==0], 'output': X_c['output'][M_c==0]}
             remain_X_t = {'input':X_t['input'][M_t==1], 'output': X_t['output'][M_t==1]}
-
+            remain_X_t_idx = np.where(M_t==1)[0]
+            
             if label_num is not None:
                 if label_num>=len(X_t['input']) or label_num>=len(remain_X_t['input']):
                     print("** Warning: No Need to Clip <remain_X_t> according to <label_num>")
@@ -552,7 +549,7 @@ class ShiftHunter:
                     M_t = self.M_t.data.cpu().numpy().copy()
                     sortidx = np.argsort(-M_t)
                     remain_X_t = {'input':X_t['input'][sortidx[:label_num]], 'output': X_t['output'][sortidx[:label_num]]}
-
+                    remain_X_t_idx = sortidx[:label_num]
                 
                 if retain_Xnum:
                     if label_num + len(self.calibrator.X_con['input']) <= EvalParams['control_num']:
@@ -565,6 +562,13 @@ class ShiftHunter:
                         remain_X_c = {'input':  X_c['input'][sortidx[:(EvalParams['control_num']-label_num)]], 
                                         'output': X_c['output'][sortidx[:(EvalParams['control_num']-label_num)]]}
 
+            
+            print('NOTICE: simulating labelling...') 
+            remain_y_t = y_t[remain_X_t_idx]
+            print('Filter',len(remain_y_t[remain_y_t==1]),'anomalies in remain_X_tre')
+            remain_X_t = {'input':  remain_X_t['input'][remain_y_t==0], 
+                          'output': remain_X_t['output'][remain_y_t==0]}
+            
             print('Remain X_c, X_t (len):', len(remain_X_c['input']), len(remain_X_t['input']))
 
             remain_X = {
@@ -576,6 +580,7 @@ class ShiftHunter:
             
             remain_X_c = X_c[M_c==0]
             remain_X_t = X_t[M_t==1]
+            remain_X_t_idx = np.where(M_t==1)[0] # this is only used for simulating labelling
 
             if label_num is not None:
                 if label_num>=len(X_t) or label_num>=len(remain_X_t):
@@ -586,6 +591,7 @@ class ShiftHunter:
                     M_t = self.M_t.data.cpu().numpy().copy()
                     sortidx = np.argsort(-M_t)
                     remain_X_t = X_t[sortidx[:label_num]]
+                    remain_X_t_idx = sortidx[:label_num]
 
                 if retain_Xnum: 
                     if label_num + len(self.calibrator.X_con) <= EvalParams['control_num']:
@@ -596,6 +602,11 @@ class ShiftHunter:
                         M_c = self.M_c.data.cpu().numpy().copy()
                         sortidx = np.argsort(M_c)
                         remain_X_c = X_c[sortidx[:(len(self.calibrator.X_con)-label_num)]]                    
+            
+            print('NOTICE: simulating labelling...') 
+            remain_y_t = y_t[remain_X_t_idx]
+            print('Filter',len(remain_y_t[remain_y_t==1]),'anomalies in remain_X_tre')
+            remain_X_t = remain_X_t[remain_y_t==0]
             
             print('Remain X_c.shape', remain_X_c.shape, 'X_t.shape', remain_X_t.shape)
             remain_X = np.concatenate((remain_X_c,remain_X_t),axis=0)
