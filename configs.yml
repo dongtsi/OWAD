@@ -10,7 +10,9 @@ DeepLog: # DeepLog (anomaly detection model) parameters
   num_classes: 1605
   num_candidates: 9 
   num_epochs: 20
+  batch_size: 1024
   num_layers: 2
+  lr: 1.e-3
   hidden_size: 64
   test_batch: 20000  # depends on the available GPU memory
   test_info: False
