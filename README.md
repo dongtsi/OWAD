@@ -20,6 +20,10 @@ In this context, **OWAD** is a novel framework to *detect*, *explain* and *adapt
 
 # Environment Setup
 
+Use the following command to install the packages:
+
+> pip install -r requirement.txt
+
 
 
 # Use Cases
@@ -32,7 +36,7 @@ We provide several cases to show how to use **OWAD** on different use cases (dif
 
 # Citation
 
-
+TBA.
 
 # More Info and Notes
 

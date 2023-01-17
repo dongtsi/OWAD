@@ -41,9 +41,9 @@ EvalParams = utils.get_params('Eval')
 def se2rmse(a):
     return torch.sqrt(sum(a.t())/a.shape[1])
 
-def train(X_train,feature_size, epoches = Params['epoches']):
+def train(X_train,feature_size, epoches = Params['epoches'],  lr=Params['lr']):
     model = autoencoder(feature_size).to(device)
-    optimizier = optim.Adam(model.parameters(), lr=Params['lr'], weight_decay=Params['weight_decay'])
+    optimizier = optim.Adam(model.parameters(), lr=lr, weight_decay=Params['weight_decay'])
     model.train()
 
     X_train = torch.from_numpy(X_train).type(torch.float)    
@@ -99,15 +99,24 @@ def test(model, thres, X_test):
     return y_pred, rmse_vec
 
 
-def test_plot(X_test, rmse_vec, thres, alpha=0.15, file_name = None, label = None):
+def test_plot(rmse_vec, thres, file_name = None, label = None):
     plt.figure()
-    plt.scatter(np.linspace(0,len(X_test)-1,len(X_test)),rmse_vec,s=10,alpha=alpha)
-    plt.plot(np.linspace(0,len(X_test)-1,len(X_test)),[thres]*len(X_test),c='black')
+    plt.plot(np.linspace(0,len(rmse_vec)-1,len(rmse_vec)),[thres]*len(rmse_vec),c='black',label='99th-threshold')
     # plt.ylim(0,thres*2.)
 
     if label is not None:
+        idx = np.where(label==0)[0]
+        plt.scatter(idx, rmse_vec[idx], s=8, color='blue', alpha=0.4, label='Normal')
+        
         idx = np.where(label==1)[0]
-        plt.scatter(idx,rmse_vec[idx],s=12,alpha=min(0.6, 2*alpha))
+        plt.scatter(idx, rmse_vec[idx], s=8, color='red', alpha=0.7, label='Anomalies')
+    else:
+        plt.scatter(np.linspace(0,len(rmse_vec)-1,len(rmse_vec)),rmse_vec,s=8,alpha=0.4, label='Test samples' )
+    
+    plt.legend()
+    plt.xlabel('Sample NO.')
+    plt.ylabel('Anomaly Score (RMSE)')
+    plt.title('Per-sample Score')
     if file_name is None:
         plt.show()
     else:
