@@ -37,6 +37,7 @@ We provide several cases to show how to use **OWAD** on different use cases (dif
 # Citation
 
 TBA.
+The paper is available at [here](https://www.ndss-symposium.org/wp-content/uploads/2023/02/ndss2023_f830_paper.pdf).
 
 # More Info and Notes
 
