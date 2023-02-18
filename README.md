@@ -24,19 +24,22 @@ Use the following command to install the packages:
 
 > pip install -r requirement.txt
 
+# Toy Example
 
+OWAD is technically complicated but with an extremely straightforward principle. To prevent you from being intimidated by the complicated technology, we provide a [TOY EXAMPLE😎](demo/Toy_example_AE_synthetic.ipynb) to help you understand the basic idea of OWAD. 
 
 # Use Cases
+
 We provide several cases to show how to use **OWAD** on different use cases (different applications, models, and datasets):
 
 - [(Normal-Confidence Anomaly Detection) LSTM, Log Anomaly Detection, BGL](demo/LogAD_LSTM_BGL.ipynb)
 - [(Abnormal-Confidence Anomaly Detection) Auto-Encoder, NIDS, Kyoto-2006](demo/NIDS_KitNET_Kyoto.ipynb)
-- 
 
 
 # Citation
 
 TBA.
+
 The paper is available at [here](https://www.ndss-symposium.org/wp-content/uploads/2023/02/ndss2023_f830_paper.pdf).
 
 # More Info and Notes
