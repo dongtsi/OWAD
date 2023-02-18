@@ -139,6 +139,7 @@ class ShiftHunter:
                  discrete_thres = EvalParams['discrete_thres'],
                  plot_compose = False,
                  auto_cali_thres = True,
+                 out_of_bounds = True,
                 ): 
 
         def discretize_mask(M_c, M_t, thres=discrete_thres):
@@ -190,7 +191,8 @@ class ShiftHunter:
             plt.bar(x, tres[0], width=width, bottom=cres[0], alpha=0.7, ec='black', label='treatment set (remain)', color='#33a02c')
             plt.legend()
 
-        def get_normal_t_idx(pctg=0.01): # percentage for threshold selection
+        def get_normal_t_idx(pctg=0.001): # percentage for threshold selection
+            # print('pctg',pctg)
             # min_c, max_c = np.min(self.control_res), np.max(self.control_res)
             c_res_tmp = np.sort(self.control_res)
             min_c = c_res_tmp[int(len(c_res_tmp)*pctg)]
@@ -198,7 +200,7 @@ class ShiftHunter:
             normal_t_idx = np.where((self.treatment_res>=min_c)&(self.treatment_res<=max_c))[0]
             return normal_t_idx
         
-        def get_abnormal_t_idx(pctg=0.01):
+        def get_abnormal_t_idx(pctg=0.001):
             # min_c, max_c = np.min(self.control_res), np.max(self.control_res)
             c_res_tmp = np.sort(self.control_res)
             min_c = c_res_tmp[int(len(c_res_tmp)*pctg)]
@@ -207,6 +209,7 @@ class ShiftHunter:
             idx_2 = np.where(self.treatment_res>max_c)[0]
             abnormal_t_idx = np.concatenate((idx_1,idx_2))
             return abnormal_t_idx
+
         
         control_res = torch.from_numpy(self.control_res).type(torch.float).to(device)
         treatment_res = torch.from_numpy(self.treatment_res).type(torch.float).to(device)
