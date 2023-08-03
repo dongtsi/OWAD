@@ -37,9 +37,15 @@ We provide several cases to show how to use **OWAD** on different use cases (dif
 
 
 # Citation
-
-TBA.
-
+Please cite the paper if you use the code, here is the Bibtex:
+```bibtex
+ @inproceedings{han2023anomaly,
+  title={Anomaly Detection in the Open World: Normality Shift Detection, Explanation, and Adaptation},
+  author={Han, Dongqi and Wang, Zhiliang and Chen, Wenqi and Wang, Kai and Yu, Rui and Wang, Su and Zhang, Han and Wang, Zhihua and Jin, Minghui and Yang, Jiahai and others},
+  booktitle={30th Annual Network and Distributed System Security Symposium (NDSS)},
+  year={2023}
+}
+```
 The paper is available at [here](https://www.ndss-symposium.org/wp-content/uploads/2023/02/ndss2023_f830_paper.pdf).
 
 # More Info and Notes
