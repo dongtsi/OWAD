@@ -20,7 +20,7 @@ DeepLog: # DeepLog (anomaly detection model) parameters
 # Below are hyper-parameters of OWAD
 ShiftDetector:
   test_numrounds: 1000
-  test_thres: 0.01
+  test_thres: 0.05
   test_bin_num: 10
 
 ShiftExplainer:

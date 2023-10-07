@@ -105,15 +105,15 @@ class ShiftHunter:
             plt.savefig(savefig)
 
     def permu_test(self, num_rounds=DetParams['test_numrounds'], test_bin_num = None): # Permutation Test of control_hist and treatment_hist
-        
+        delta = 1 # in case of inf of entropy (when q is 0 while p is not 0)
         if test_bin_num is None:
             test_bin_num = self.bin_num
         def test_func(x,y): # x --> obs/treatment  y--> exp/control
             f_x = np.histogram(x, test_bin_num)[0]
             f_y = np.histogram(y, test_bin_num)[0]
             fr_E = f_y/np.sum(f_y)
-            E = np.sum(f_x) * fr_E
-            O = f_x
+            E = np.sum(f_x) * fr_E + delta
+            O = f_x + delta
             test_stats = entropy(O, E)
             return test_stats
 
