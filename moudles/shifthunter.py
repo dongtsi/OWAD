@@ -83,11 +83,13 @@ class ShiftHunter:
         
         def get_smooth_axis(res):
             x = (res[1][:-1] + res[1][1:]) / 2
-            x = np.insert(x,0,0.)
-            x = np.insert(x,len(x),1.)
+            # x = np.insert(x,0,0.)
+            # x = np.insert(x,len(x),1.)
+            x = np.concatenate(([0.], x, [1.]))
             y = res[0]
-            y = np.insert(y,0,0.)
-            y = np.insert(y,len(y),0.)
+            # y = np.insert(y,0,0.)
+            # y = np.insert(y,len(y),0.)
+            y = np.concatenate(([0.], y, [0.]))
             X_Y_Spline = make_interp_spline(x, y)
             X_ = np.linspace(x.min(), x.max(), 300)
             Y_ = X_Y_Spline(X_)
